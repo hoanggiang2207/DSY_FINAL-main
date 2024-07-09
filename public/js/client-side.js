@@ -27,7 +27,7 @@ const createProduct = (product) => {
 };
 
 // Fetch all products
-fetch('/get-all-products')
+fetch('/products')
     .then(res => res.json())
     .then(data => {
         if (data === 'no products') {

@@ -398,7 +398,7 @@ app.get('/success', async (req, res) => {
     }   
 })
 
-app.get('/get-all-products', (req, res) => {
+app.get('/products', (req, res) => {
     let products = collection(db, "products");
 
     getDocs(products).then(productDocs => {

@@ -1,28 +1,68 @@
 // allProducts.js
 
-// Assuming you have a container element to display the products
-let productContainer = document.querySelector('.product-container');
+let ratingStarInput = [...document.querySelectorAll('.rating-star')];
+let rate = 0;
 
-const createProduct = (product) => {
-    // Create HTML elements to display the product and append them to productContainer
-    // Modify this according to your product structure
-    let productElement = document.createElement('div');
-    productElement.innerHTML = `<p>${product.name}</p>`; // Adjust this based on your product structure
-    productContainer.appendChild(productElement);
+ratingStarInput.map((star, index) => {
+    star.addEventListener('click', () => {
+        rate = `${index + 1}.0`;
+        for (let i = 0; i < 5; i++) {
+            if (i <= index) {
+                ratingStarInput[i].src = `../img/fill star.png`;
+            } else {
+                ratingStarInput[i].src = `../img/no fill star.png`;
+            }
+        }
+    });
+});
+
+// Function to create product card
+const createProductCard = (product) => {
+    return `
+        <div class="product-card">
+            <img src="${product.image}" alt="${product.name}" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-des">${product.shortDes}</p>
+                <p class="price">$${product.price}</p>
+                <button class="cart-btn">Add to Cart</button>
+            </div>
+        </div>
+    `;
 };
 
-// Fetch all products
-fetch('/get-all-products')
-    .then(res => res.json())
+const productContainer = document.querySelector('.product-container');
+
+const setData = (data) => {
+    productContainer.innerHTML += createProductCard(data);
+};
+
+const fetchProductData = () => {
+    fetch('/products', {
+        method: 'get',
+        headers: new Headers({'Content-Type': 'application/json'})
+    })
+    .then(res => {
+        if (res.redirected) {
+           
+            return;
+        }
+        return res.json();
+    })
     .then(data => {
-        if (data === 'no products') {
-            // Handle case where no products are available
-            console.log('No products available.');
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(product => {
+                setData(product);
+            });
         } else {
-            // Display each product
-            data.forEach(product => createProduct(product));
+            alert('No products found');
         }
     })
-    .catch(error => {
-        console.error('Error fetching products:', error);
+    .catch(err => {
+        console.log(err);
+        alert('No products found');
+        location.replace('/404');
     });
+}
+
+fetchProductData();
